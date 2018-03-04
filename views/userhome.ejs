@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<% include ./partials/header %>
+
+<head><title>My Page</title></head>
+<body>
+<nav class="nav nav-pills nav-justified">
+    <a class="nav-link" href="/">Home</a>
+    <a class="nav-link active" href="/userhome">My Page</a>
+    <a class="nav-link" href="/logout">Logout</a>
+</nav>
+
+<div class="jumbotron">
+    <div class="container">
+    <h1 class="display-3">All About Me!</h1>
+    <p>
+        email: <%= user.email %>
+    </p>
+    <p>
+        password (sorry, it's encrypted!): <%= user.password %>
+    </p>
+    <p>
+        role: <%= user.role %>
+    </p>
+    <p>
+        id: <%= user._id %>
+    </p>
+    </div>
+</div>
+
+<% include ./partials/footer %>
+<% include ./partials/scripts %>
+</body>
+</html>

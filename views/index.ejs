@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<% include ./partials/header %>
+
+<head><title>Welcome</title></head>
+<body>
+
+<nav class="nav nav-pills nav-justified">
+    <a class="nav-link active" href="/">Home</a>
+    <% if (req.isAuthenticated()) { %>
+        <a class="nav-link" href="/userhome">My Page</a>
+        <a class="nav-link" href="/logout">Logout</a>
+    <% } else { %>
+        <a class="nav-link" href="/signup">Register</a>
+        <a class="nav-link" href="/login">Login</a>
+    <% } %>
+</nav>
+<div class="jumbotron">
+        <div class="container">
+        <h1 class="display-3">Welcome to A-MyZone.com!</h1>
+        <div class="alert alert-danger" role="alert">
+            <h2 class="display-5">Free if we do not beat Amazon's offers!</h2>
+        </div>
+        <p>
+            Login or Register. Use the menu above!
+        </p>
+
+<% include ./partials/footer %>
+<% include ./partials/scripts %>
+</body>
+</html>
