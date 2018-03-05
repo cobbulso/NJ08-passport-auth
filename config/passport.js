@@ -17,46 +17,38 @@ passport.deserializeUser((id, callback) => {
     })
 });
 
-passport.use('localsignup', new LocalStrategy({
+const localStrategyConfig = {
     usernameField: 'email',
     passwordField: 'password',
-    passReqToCallback: true
-}, (req, email, password, callback) => {
-    User.findOne({'email': email}, (err, user) => {
-        if (err) {
-            return callback(err);
-        }
-        if (user) {
-            return callback(null, false, req.flash('signuperror','Email is already in use'));
-        }
-        const newUser = new User();
-        newUser.email = email;
-        newUser.password = newUser.encryptPassword(password);
-        newUser.save((err, result) => {
-            if (err) {
-                return callback(err)
-            }
-            console.log('save', newUser);
-            return callback(null, newUser, req.flash('signupsuccess', 'Sign up successful! Login, please!'));
-        });
-    });
-}));
+    passReqToCallback: true // pass the eniter request to the callback
+}
 
-passport.use('locallogin', new LocalStrategy({
-    usernameField: 'email',
-    passwordField: 'password',
-    passReqToCallback: true
-}, (req, email, password, callback) => {
-    User.findOne({'email': email}, (err, user) => {
-        if (err) {
-            return callback(err);
-        }
-        if (!user) {
-            return callback(null, false, req.flash('loginerror', 'username not found'));
-        }
-        if (!user.verifyPassword(password, user.password)) {
-            return callback(null, false, req.flash('loginerror', 'incorrect password'));
-        }
-        return callback(null, user);
-    });
-}));
+passport.use('localsignup',
+    new LocalStrategy(localStrategyConfig, (req, email, password, callback) => {
+        User.findOne({'email': email}, (err, user) => {
+            if (err) return callback(err);
+            if (user) return callback(null, false, req.flash('signuperror','Email is already in use'));
+
+            const newUser = new User();
+            newUser.email = email;
+            newUser.password = newUser.encryptPassword(password);
+            newUser.save((err, result) => {
+                if (err) return callback(err);
+                return callback(null, newUser, req.flash('signupsuccess', 'Sign up successful! Login, please!'));
+            });
+        });
+    })
+);
+
+passport.use('locallogin',
+    new LocalStrategy(localStrategyConfig, (req, email, password, callback) => {
+        User.findOne({'email': email}, (err, user) => {
+            if (err) return callback(err);
+            if (user && user.verifyPassword(password, user.password)) {
+                return callback(null, user); // login success
+            } else {
+                return callback(null, false, req.flash('loginerror', 'username not found'));
+            }
+        });
+    })
+);
