@@ -3,17 +3,29 @@ const bcrypt = require('bcrypt');
 mongoose.Promise = global.Promise;
 
 const userSchema = mongoose.Schema({
-    email: { type: String, required: true, trim: true, unique: true },
-    password: { type: String, required: true, minlength: 3 },
-    role: { type: String, enum: ['customer', 'premium', 'admin'], default: 'customer' }
+    email: {
+        type: String, required: true, trim: true, unique: true
+    },
+    password: {
+        type: String, required: true, minlength: 3
+    },
+    role: {
+        type: String, enum: ['customer', 'premium', 'admin'], default: 'customer'
+    }
 });
 
-userSchema.methods.encryptPassword = function(password) {
-    return bcrypt.hashSync(password, bcrypt.genSaltSync(10), null);
+userSchema.methods.encryptPassword = function(password, callback) {
+    bcrypt.hash(password, 10, (err, hash) => {
+        if (err) return callback(err);
+        else return callback(null, hash);
+    });
 }
 
-userSchema.methods.verifyPassword = function(password) {
-    return bcrypt.compareSync(password, this.password);
+userSchema.methods.verifyPassword = function(password, callback) {
+    bcrypt.compare(password, this.password, (err, result) => {
+        if (err) return callback(err);
+        return callback(null, result);
+    });
 }
 
 module.exports = mongoose.model('users', userSchema);

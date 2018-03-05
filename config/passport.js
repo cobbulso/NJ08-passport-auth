@@ -26,29 +26,33 @@ const localStrategyConfig = {
 passport.use('localsignup',
     new LocalStrategy(localStrategyConfig, (req, email, password, callback) => {
         User.findOne({'email': email}, (err, user) => {
-            if (err) return callback(err);
+            if (err) return callback(null, false, req.flash('signuperror', err));
             if (user) return callback(null, false, req.flash('signuperror','Email is already in use'));
 
             const newUser = new User();
             newUser.email = email;
-            newUser.password = newUser.encryptPassword(password);
-            newUser.save((err, result) => {
-                if (err) return callback(err);
-                return callback(null, newUser, req.flash('signupsuccess', 'Sign up successful! Login, please!'));
+            newUser.encryptPassword(password, (err, result) => {
+                if (err) return callback(null, false, req.flash('signuperror', err));
+                newUser.password = result;
+                newUser.save((err, result) => {
+                    if (err) return callback(err);
+                    return callback(null, newUser, req.flash('signupsuccess', 'Sign up successful! Login, please!'));
+                });
             });
         });
     })
 );
 
-passport.use('locallogin',
-    new LocalStrategy(localStrategyConfig, (req, email, password, callback) => {
+    passport.use('locallogin',
+        new LocalStrategy(localStrategyConfig, (req, email, password, callback) => {
         User.findOne({'email': email}, (err, user) => {
-            if (err) return callback(err);
-            if (user && user.verifyPassword(password, user.password)) {
-                return callback(null, user); // login success
-            } else {
-                return callback(null, false, req.flash('loginerror', 'Incorrect email and password'));
-            }
+            if (err) return callback(null, false, req.flash('loginerror', err));
+            if (!user) return callback(null, false, req.flash('loginerror', 'Invalid email'));
+            user.verifyPassword(password, (err, result) => {
+                if (err) return callback(null, false, req.flash('loginerror', err)); 
+                if (!result) return callback(null, false, req.flash('loginerror', 'Incorrect password'));
+                return callback(null, user);
+            });
         });
     })
 );
