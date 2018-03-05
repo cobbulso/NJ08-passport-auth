@@ -43,8 +43,8 @@ passport.use('localsignup',
     })
 );
 
-    passport.use('locallogin',
-        new LocalStrategy(localStrategyConfig, (req, email, password, callback) => {
+passport.use('locallogin',
+    new LocalStrategy(localStrategyConfig, (req, email, password, callback) => {
         User.findOne({'email': email}, (err, user) => {
             if (err) return callback(null, false, req.flash('loginerror', err));
             if (!user) return callback(null, false, req.flash('loginerror', 'Invalid email'));
