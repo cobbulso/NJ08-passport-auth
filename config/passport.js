@@ -47,7 +47,7 @@ passport.use('locallogin',
             if (user && user.verifyPassword(password, user.password)) {
                 return callback(null, user); // login success
             } else {
-                return callback(null, false, req.flash('loginerror', 'username not found'));
+                return callback(null, false, req.flash('loginerror', 'Incorrect email and password'));
             }
         });
     })
